@@ -4,12 +4,14 @@ type TokenFieldMapping struct {
 	Id        string // 主键ID字段
 	UserToken string // 用户token字段
 	UserID    string // 用户ID字段
+	IsDelete  string // 是否删除字段
 }
 
 var TokenFieldCfg = TokenFieldMapping{
 	Id:        "id",
 	UserToken: "user_token",
 	UserID:    "user_id",
+	IsDelete:  "is_delete",
 }
 
 type UserTokenDto struct {

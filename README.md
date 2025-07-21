@@ -33,6 +33,46 @@ CREATE TABLE IF NOT EXISTS `t_user_token_1` (
 
 ```
 
+## 新增token记录
+```
+package main
+
+import (
+	"fmt"
+	"github.com/jellycheng/gosupport"
+	"github.com/jellycheng/gosupport/dbutils"
+	"github.com/jellycheng/gotoken"
+)
+
+func main() {
+	dsn := dbutils.GetDsn(map[string]interface{}{
+		"host":     "localhost",
+		"port":     "3306",
+		"dbname":   "db_mall",
+		"username": "root",
+		"password": "88888888",
+	})
+	con, err := dbutils.GetDbConnect("db_mall", dsn)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	data := map[string]interface{}{
+		"user_token":  "token-xxx123",
+		"user_id":     789,
+		"create_time": gosupport.TimeNow(),
+	}
+	if lastId, err := gotoken.AddToken(con, data, "t_user_token_1"); err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println(lastId)
+	}
+
+}
+
+```
+
 ## 查询token信息
 ```
 package main
@@ -139,6 +179,47 @@ func main() {
 
 	token := "4cbca931c92015902b7483877e42f5d3"
 	if affectedNum, err := gotoken.DelToken(con, token, "t_user_token_1"); err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println(affectedNum)
+	}
+
+}
+
+```
+
+## 更新token记录
+```
+package main
+
+import (
+	"fmt"
+	"github.com/jellycheng/gosupport"
+	"github.com/jellycheng/gosupport/dbutils"
+	"github.com/jellycheng/gotoken"
+)
+
+func main() {
+	dsn := dbutils.GetDsn(map[string]interface{}{
+		"host":     "localhost",
+		"port":     "3306",
+		"dbname":   "db_mall",
+		"username": "root",
+		"password": "88888888",
+	})
+	con, err := dbutils.GetDbConnect("db_mall", dsn)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	token := "token-xxx123"
+	data := map[string]interface{}{
+		"invalid_type": 1,
+		"active_time":  gosupport.TimeNow(),
+		"update_time":  gosupport.TimeNow(),
+	}
+	if affectedNum, err := gotoken.UpdateToken(con, token, data, "t_user_token_1"); err != nil {
 		fmt.Println(err.Error())
 	} else {
 		fmt.Println(affectedNum)

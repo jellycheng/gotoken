@@ -70,3 +70,48 @@ func DelToken(connect *sql.DB, token string, tbl string) (int64, error) {
 	sqlStr := fmt.Sprintf("update %s set is_delete=1,delete_time=?,update_time=? where `%s`=? and is_delete=0 limit 1;", tbl, TokenFieldCfg.UserToken)
 	return dbutils.UpdateSql(connect, sqlStr, curTime, curTime, token)
 }
+
+// 新增token记录
+func AddToken(connect *sql.DB, data map[string]interface{}, tbl string) (int64, error) {
+	if tbl == "" {
+		tbl = DefaultTokenTable
+	}
+	var lastid int64 = 0
+	if len(data) == 0 {
+		return lastid, fmt.Errorf("data is empty")
+	}
+	fileds := make([]string, 0)
+	values := make([]interface{}, 0)
+	for k, v := range data {
+		fileds = append(fileds, k)
+		values = append(values, v)
+	}
+	sqlObj := dbutils.NewSQLBuilderInsert().SetTable(tbl).SetInsertData(fileds, values...)
+	sql, _ := sqlObj.GetSql()
+	lastid, _ = dbutils.InsertSql(connect, sql, sqlObj.GetParamValues()...)
+	return lastid, nil
+}
+
+// 更新token记录
+func UpdateToken(connect *sql.DB, token string, data map[string]interface{}, tbl string) (int64, error) {
+	if tbl == "" {
+		tbl = DefaultTokenTable
+	}
+	var affectedNum int64 = 0
+	if token == "" {
+		return affectedNum, fmt.Errorf("token is empty")
+	}
+	if len(data) == 0 {
+		return affectedNum, fmt.Errorf("data is empty")
+	}
+	fileds := make([]string, 0)
+	values := make([]interface{}, 0)
+	for k, v := range data {
+		fileds = append(fileds, k)
+		values = append(values, v)
+	}
+	sqlObj := dbutils.NewSQLBuilderUpdate().SetTable(tbl).SetUpdateData(fileds, values...).Where(TokenFieldCfg.UserToken, "=", token).Where(TokenFieldCfg.IsDelete, "=", 0)
+	sql, _ := sqlObj.GetSQL()
+	affectedNum, _ = dbutils.UpdateSql(connect, sql, sqlObj.GetParamValues()...)
+	return affectedNum, nil
+}
