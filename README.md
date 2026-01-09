@@ -52,6 +52,7 @@ func main() {
 		"username": "root",
 		"password": "88888888",
 	})
+	// 或者 dsn := "root:88888888@tcp(localhost:3306)/db_mall?charset=utf8"
 	con, err := dbutils.GetDbConnect("db_mall", dsn)
 	if err != nil {
 		fmt.Println(err.Error())
